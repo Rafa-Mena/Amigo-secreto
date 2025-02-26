@@ -1,39 +1,57 @@
-// El principal objetivo de este desafío es fortalecer tus habilidades en lógica de programación. Aquí deberás desarrollar la lógica para resolver el problema.
-// Agregar amigos
-let listaAmigos = [];
+const inputAmigo = document.getElementById("amigo");
+const listaAmigos = [];
+const ulListaAmigos = document.getElementById("listaAmigos");
+const ulResultado = document.getElementById("resultado");
+const resetButton = document.getElementById('resetButton');
 
 function agregarAmigo() {
-  // Obtener el valor del input
-  let nombreAmigo = document.querySelector("#amigo").value.trim();
-
-  // Agregar el nombre a la lista usando push
-  if (nombreAmigo === '') {
-    alert('Ingresa un nombre');
+  const nuevoAmigo = inputAmigo.value.trim();
+  if (!nuevoAmigo) {
+    alert("Por favor, ingresa un nombre válido.");
     return;
   }
+  const nombreEnMayusculas = nuevoAmigo.toUpperCase();
+  if (listaAmigos.some(amigo => amigo.toUpperCase() === nombreEnMayusculas)) {
+    alert("Este nombre ya está en la lista. Por favor, ingresa otro nombre.");
+    return;
+  }
+  listaAmigos.push(nuevoAmigo);
+  const nuevoElemento = document.createElement("li");
+  nuevoElemento.textContent = nuevoAmigo;
+  ulListaAmigos.appendChild(nuevoElemento);
+  inputAmigo.value = ""; // Limpiar el campo de entrada
+}
 
-  listaAmigos.push(nombreAmigo);
+inputAmigo.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    agregarAmigo();
+  }
+});
 
-  // Crear un nuevo elemento <li>
-  let lista = document.querySelector("#listaAmigos");
-  let nuevoAmigo = document.createElement("li");
-  nuevoAmigo.textContent = nombreAmigo;
-  lista.appendChild(nuevoAmigo);
-
-  // Limpiar el campo para el siguiente nombre
-  document.querySelector("#amigo").value = "";
+function invertirNombre(nombre) {
+  return nombre.split('').reverse().join('');
 }
 
 function sortearAmigo() {
-  // Verificar si hay amigos en la lista
-  if (listaAmigos.length === 0) {
-    alert('No hay amigos en la lista para sortear.');
+  if (listaAmigos.length < 2) {
+    ulResultado.textContent = "Necesitas al menos 2 amigos en la lista para poder sortear.";
     return;
   }
-
-  // Sorteo
-  document.getElementById('listaAmigos').innerHTML = '';
-  let sortearAmigo = Math.floor(Math.random() * listaAmigos.length);
-  let amigoSecreto = listaAmigos[sortearAmigo];
-  document.getElementById("resultado").innerHTML = `<span style="color: black;">El amigo secreto es:</span> ${amigoSecreto}`;
+  const amigosRestantes = [...listaAmigos];
+  const random = Math.floor(Math.random() * amigosRestantes.length);
+  const amigoSecreto = amigosRestantes[random];
+  amigosRestantes.splice(random, 1);
+  listaAmigos.splice(listaAmigos.indexOf(amigoSecreto), 1);
+  ulResultado.textContent = `El amigo secreto es: ${amigoSecreto}`;
 }
+
+function resetGame() {
+  if (confirm("¿Estás seguro de que quieres borrar la lista de amigos?")) {
+    listaAmigos.length = 0;
+    ulListaAmigos.innerHTML = "";
+    ulResultado.textContent = "";
+    inputAmigo.value = ""; // Limpiar el campo de entrada
+  }
+}
+
+resetButton.addEventListener('click', resetGame);
